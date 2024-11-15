@@ -1,0 +1,811 @@
+---
+title: "R Notebook"
+output: text-to-dataframe(3)
+---
+
+
+fixing the pdf to text errors
+
+there is one observation lacking in data after the transformation and there are 20 NA which shouldn't be there I will fix this manually. I will first find out where are the NA in order to fix them 
+
+ 
+
+
+This notebook pdf to text to dataframe errors that had happened during the transition 
+
+# 2024 year
+
+```{r}
+ARPL24 <-read.csv("data pdf/2024-Tax-sale.csv")
+
+```
+
+
+```{r}
+sum(is.na(ARPL24))
+
+NAlist<-ARPL24[!complete.cases(ARPL24), ]
+
+NAlist
+
+# fixing NAs
+ARPL24[196,]
+ARPL24[196, "Address"] <- "**NS FREDERICK AVE 173-2 W OF S ROCK GLEN ROAD" # Replace with the actual address value
+ARPL24[196, "block_lot"] <- "8030B-126"  # Replace with the actual block_lot value
+ARPL24[196, "lot_size"] <- " 0.269"        # Replace with the actual lot_size value
+
+
+ARPL24[383,]
+ARPL24[383, "Address"] <- "**NWS HINELINE RD 795 FT SW OF HAVERHILL RD" # Replace with the actual address value
+ARPL24[383, "block_lot"] <- "7654D-45"  # Replace with the actual block_lot value
+ARPL24[383, "lot_size"] <- " 25X110"        # Replace with the actual lot_size value
+
+ARPL24[1257,]
+ARPL24[1257,"Owner_Name"] <-"HARRIS TERRELL HARRIS, TRENTON HARRIS, TRAVIS"
+ARPL24[1257,"lien"] <- "5,449.88"
+
+
+ARPL24[1618,]
+ARPL24[1618,"Owner_Name"]<- "LEARN’IN TO LIVE AGAIN, INC"
+ARPL24[1618,"lien"] <- "4775.39"
+
+
+ARPL24[1619,]
+ARPL24[1619,"Owner_Name"]<- "LEARN’IN TO LIVE AGAIN, INC"
+ARPL24[1619,"lien"] <- "4250.67"
+
+
+ARPL24[1752,]
+ARPL24[1752,"Owner_Name"]<- "BEST HOUSE TO RENT LLC"
+ARPL24[1752,"lien"] <- "406.80"
+
+ARPL24[1969,]
+ARPL24[1969,"Owner_Name"]<- "BARNETT, BARRY K BARNETT, JACQUELINE K"
+ARPL24[1969,"lien"] <- "2890.30"
+
+
+
+ARPL24[3167,]
+ARPL24[3167,"Owner_Name"]<- "WILLIAMS,ALBERT E CURTIS, CHARLES W WILLIAMS, PORTIA R"
+ARPL24[3167,"lien"] <- "128,479.37"
+
+
+ARPL24[4383,]
+ARPL24[4383,"Owner_Name"]<- "RAGS TO RICHES I, LLC"
+ARPL24[4383,"lien"] <- "1273.36"
+
+
+
+
+ARPL24[4591,]
+
+ARPL24[4591,"Owner_Name"] <- "D CAREY DEVELOPMENT, LLC AND MOSKUNAS, THERESA SULIGA"
+ARPL24[4591,"lien"] <- "2911.48"
+
+
+ARPL24[5321,]
+ARPL24[5321,"Owner_Name"]<- "SEE IT TO THE END, INC"
+ARPL24[5321,"lien"] <- "529.84"
+
+
+ARPL24[7837,"Owner_Name"]<- "LOVE TO CARE RESIDENTIAL SVCS,LLC"
+ARPL24[7837,"lien"] <- "615.33"
+
+
+ARPL24[8750,"Owner_Name"]<- "LOVE TO CARE RESIDENTIAL SVCS,LLC"
+ARPL24[8750,"lien"] <- "634.37"
+
+
+ARPL24[9084,"Owner_Name"]<- "DARE TO CARE LLC"
+ARPL24[9084,"lien"] <- "1114.53"
+
+
+ARPL24[9827,"Owner_Name"]<- "KEYS TO WEALTH LIMITED PARTNERSHIP"
+ARPL24[9827,"lien"] <- "5434.34"
+
+
+ARPL24[10438,"Owner_Name"]<- "COMMUNITIES ORGANIZED TO IMPROVE LIFE COMMUNITY ECONOMIC DEV"
+ARPL24[10438,"lien"] <- "266572.13"
+
+
+ARPL24[10447,"Owner_Name"]<- "COMMUNITIES ORGANIZED TO IMPROVE LIFE COMMUNITY ECONOMIC DEV"
+ARPL24[10447,"lien"] <- "264017.24"
+
+
+ARPL24[10740,"Owner_Name"]<- "NEW HOMES DEVELOPMENT & RENOVATIONS, LLC"
+ARPL24[10740,"lien"] <- "263.68"
+
+    
+ARPL24[11386,"Owner_Name"]<- "UP TO DATE HOME IMPROVEMENT & INVESTMENT, LLC"
+ARPL24[11386,"lien"] <- "872.64"
+
+
+ARPL24[12027,"Owner_Name"]<- "COMMUNITIES ORGANIZED TO IMPROVE LIFE COMMUNITY ECONOMIC DEV"
+ARPL24[12027,"lien"] <- "298481.63"
+
+
+
+ARPL24[12725,"Owner_Name"]<- "A PLACE TO CALL HOME INC"
+ARPL24[12725,"lien"] <- "1189.86"
+
+
+ARPL24[13223,"Owner_Name"]<- "RAGS TO RICHES 1 LLC"
+ARPL24[13223,"lien"] <- "943.80"
+
+
+ARPL24[13362,"Owner_Name"]<- "DOUGLAS, JOHN G DOUGLAS, MATTHEW WICLIFFE"
+ARPL24[13362,"lien"] <- "357.92"
+
+14126   
+
+ARPL24[14126,"Owner_Name"]<- "A PLACE TO CALL HOME INC"
+ARPL24[14126,"lien"] <- "2516.86"
+
+    
+
+ARPL24[14438,"Owner_Name"]<- "HIGHWAY TO HEAVEN CHURCH INC"
+ARPL24[14438,"lien"] <- "5559.70"
+
+
+ARPL24[14943,"Owner_Name"]<- "BACK TO THE BIBLE APOLTOLIC FAITH CHURCH"
+ARPL24[14943,"lien"] <- "606406.54"
+
+
+ARPL24[16613,"Owner_Name"]<- "1101 ST PAUL #2304 LLC"
+ARPL24[16613,"lien"] <- "526.04"
+
+
+ARPL24[17072,"Owner_Name"]<- "LOVE TO CARE RESIDENTIAL SERVICES LLC"
+ARPL24[17072,"lien"] <- "571.05"
+
+18106
+
+ARPL24[18106,"Owner_Name"]<- "DEUTSCHE BANK TRUST COMPANY AMERICAS"
+ARPL24[18106,"lien"] <- "50939.19"
+
+18499   
+
+ARPL24[18499,"Owner_Name"]<- "LOVE TO CARE RESIDENTIAL SERVICES LLC"
+ARPL24[18499,"lien"] <- "512.24"
+
+18589      
+
+ARPL24[18589,"Owner_Name"]<- "KEYS TO WEALTH, LP"
+ARPL24[18589,"lien"] <- "1197.72"
+
+
+ARPL24[19533 ,]
+ARPL24[19533,"lien"] <- "1544862.04"
+
+ARPL24[5931 , "lien"] <- "978.08"
+
+
+ARPL24[19534,"Count"] <- "19534"
+ARPL24[19534,"Address"] <- "2807-2841 EDGECOMBE CIRCLE SOUTH"
+ARPL24[19534,"block_lot"] <- "3350D-70"
+ARPL24[19534,"lot_size"] <- "0.913"
+ARPL24[19534,"Owner_Name"]<- "VRAJBHOOMI,LLC"
+ARPL24[19534,"assessed_value"] <- "$39,700"
+ARPL24[19534,"lien"] <- "1058.00"
+
+
+```
+while I was separating block and lot to to prepare data for merging with other data i noticed that rows 113, 194, 706 had problems while there were converting from text to dataframe that need to be fixed
+
+```{r}
+ARPL24[113,]
+ARPL24[113,"block_lot"]<- "6458-4"
+ARPL24[113,"lot_size"]<- "0.228 ACRES"
+
+ARPL24[194,]
+ARPL24[194,"block_lot"]<- "7004-6"
+ARPL24[194,"lot_size"]<- "0.832 ACRES"
+
+ARPL24[706,]
+ARPL24[706,"block_lot"]<- "6526-13"
+ARPL24[706,"lot_size"]<- "0.954 ACRES"
+
+
+
+```
+
+save the file 
+```{r}
+write.csv(ARPL24, "data pdf/2024-Tax-sale.csv", row.names = FALSE)
+
+```
+
+
+# 2023
+I need to fix the NA and and add the one missing observation
+```{r}
+ARPL23 <-read.csv("data pdf/2023-Tax-sale.csv")
+
+```
+
+```{r}
+sum(is.na(ARPL23))
+NAlist<-ARPL23[!complete.cases(ARPL23), ]
+NAlist
+
+# fixing NAs
+ARPL23[206,]
+ARPL23[206, "Address"] <- "**SS 10 FT ALLEY 1ST S OF FEDERAL ST 149 FT E OF N C" # Replace with the actual address value
+ARPL23[206, "block_lot"] <- "1482-43"  # Replace with the actual block_lot value
+ARPL23[206, "lot_size"] <- "0.026"        # Replace with the actual lot_size value
+#ARPL23[206, "Owner_Name"] <- ""        # Replace with the actual lot_size value
+#ARPL23[206, "lien"] <- ""        # Replace with the actual lot_size value
+#ARPL23[206, "assessed_value"] <- ""        # Replace with the actual lot_size value
+
+  
+
+ARPL23[511,]
+ARPL23[511, "Owner_Name"] <- "STATE OF MARYLAND, TO THE USE OF THE DEPARTMENT OF THE ENVIR"        
+ARPL23[511, "lien"] <- "1099.70"        
+
+ 
+
+ARPL23[999,]
+ARPL23[999, "Owner_Name"] <- "LEARN’IN TO LIVE AGAIN, INC"        
+ARPL23[999, "lien"] <- "338.58"        
+
+1814 
+
+ARPL23[1814,]
+ARPL23[1814, "lien"] <- "765.80"        
+
+ 
+
+ARPL23[3090,]
+ARPL23[3090, "Owner_Name"] <- "DORSEY REAL ESTATE INVESTMENTS LLC SMITHS HOUSES TO HOMES LL"        
+ARPL23[3090, "lien"] <- "4059.64"        
+
+  
+
+ARPL23[3116,]
+ARPL23[3116, "Owner_Name"] <- "BURRELL, JAMES R BURRELL, KRISHNAJ"        
+ARPL23[3116, "lien"] <- "14959.49"        
+
+
+
+ARPL23[3883,]
+ARPL23[3883, "Owner_Name"] <- "TRUTH TO NEW LIFE APOSTOLIC POST RELEASE CENTER AND OUTREACH"        
+ARPL23[3883, "lien"] <- "48979.47"        
+
+
+ARPL23[4293,]
+ARPL23[4293, "Owner_Name"] <- "ROOF TO THE FLOOR, LLC"        
+ARPL23[4293, "lien"] <- "257.35"        
+
+ARPL23[4605,]
+ARPL23[4605, "lien"] <- "1802.94"        
+
+
+ARPL23[5713,]
+ARPL23[5713, "Owner_Name"] <- "TO SMITHS HOUSES TO HOMES LLC"        
+ARPL23[5713, "lien"] <- "4122.94"        
+
+   
+
+ARPL23[5792,]
+ARPL23[5792, "Owner_Name"] <- "CASTELLANOS, ELVIS R ENAMORADO AGUILAR, DAYSI L VELASQUEZ"        
+ARPL23[5792, "lien"] <- "3289.76"        
+ARPL23[5792, "assessed_value"] <- "124,400"        
+
+    
+
+ARPL23[7220,]
+ARPL23[7220, "Owner_Name"] <- "DARE TO CARE TOO LLC"        
+ARPL23[7220, "lien"] <- "1024.83"        
+
+
+ARPL23[7856,]
+ARPL23[7856, "Owner_Name"] <- "KEYS TO WEALTH LIMITED PARTNERSHIP"        
+ARPL23[7856, "lien"] <- "2414.44"        
+
+   
+
+ARPL23[9243,]
+ARPL23[9243, "Owner_Name"] <- "UP TO DATE HOME IMPROVEMENT & INVESTMENT, LLC"        
+ARPL23[9243, "lien"] <- "836.10"        
+
+ 
+
+ARPL23[10909,]
+ARPL23[10909, "Owner_Name"] <- "LITTLE ARK MISSIONARY BAPTIST CHURC, INC"        
+ARPL23[10909, "lien"] <- "5966.50"        
+
+
+ARPL23[11081,]
+ARPL23[11081, "Owner_Name"] <- "HOME TO LIVE, LLC"        
+ARPL23[11081, "lien"] <- "405.46"        
+
+   
+
+ARPL23[12475,]
+ARPL23[12475, "Owner_Name"] <- "CITY TO SEA, LLC"        
+ARPL23[12475, "lien"] <- "1075.00"        
+
+  
+
+ARPL23[15033,]
+ARPL23[15033, "Owner_Name"] <- "POLLARD, CLARENCE POLLARD, ROSEMAEY"        
+ARPL23[15033, "lien"] <- "1260.99"        
+
+    
+
+ARPL23[15403,]
+ARPL23[15403, "Owner_Name"] <- "KEYS TO WEALTH, LP"        
+ARPL23[15403, "lien"] <- "1064.58"        
+
+
+ARPL23[15902,]
+ARPL23[15902, "Owner_Name"] <- "KEYS TO WEALTH, LP"        
+ARPL23[15902, "lien"] <- "458.18"        
+
+
+ARPL23[16244,]
+ARPL23[16244,"Count"] <-16244
+ARPL23[16244, "Address"] <- "2807-2841 EDGECOMBE CIRCLE SOUTH" # Replace with the   
+ARPL23[16244, "block_lot"] <- "3350D-70"  # Replace with the actual block_lot value
+ARPL23[16244, "lot_size"] <- "0.913"        # Replace with the actual lot_size value
+ARPL23[16244, "Owner_Name"] <- "VRAJBHOOMI, LLC"        # Replace with the actual lot_size value
+ARPL23[16244, "lien"] <- "1389.42"        # Replace with the actual lot_size value
+ARPL23[16244, "assessed_value"] <- "39,700"        # Replace with the actual lot_size value
+
+```
+
+
+while I was separating block and lot to to prepare data for merging with other data i noticed that rows 113, 194, 706 had problems while there were converting from text to dataframe that need to be fixed
+
+```{r}
+ARPL23[14,]
+ARPL23[14,"block_lot"]<- "1060-2"
+ARPL23[14,"lot_size"]<- "1.168 ACRES"
+
+ARPL23[117,]
+ARPL23[117,"block_lot"]<- "6750-35A"
+ARPL23[117,"lot_size"]<- "0.054 ACRES"
+
+
+
+```
+
+save the cvs 
+```{r}
+
+write.csv(ARPL23, "data pdf/2023-Tax-sale.csv", row.names = FALSE)
+
+
+```
+
+
+
+# 2022
+
+```{r}
+
+ARPL22 <-read.csv("data pdf/2022-Tax-sale.csv")
+
+ARPL22<-df
+
+```
+
+remove , from liens
+```{r}
+
+
+ARPL22$lien <- gsub(",", "", ARPL22$lien)
+
+```
+
+fix NAs
+```{r}
+sum(is.na(ARPL22))
+NAlist<-ARPL22[!complete.cases(ARPL22), ]
+
+# 2021 2295 3377 4905 6468
+
+
+ARPL22[2021,]
+ARPL22[2021, "Owner_Name"] <- "LORD, JACINTO ARNOLD"        # Replace with the actual lot_size value
+ARPL22[2021, "lien"] <- "159699.23"        # Replace with the actual lot_size value
+
+ARPL22[2295,]
+ARPL22[2295, "Owner_Name"] <- "HIGHWAY TO HEAVEN OUTREACH MINISTRY, INC."        # Replace with the actual lot_size value
+ARPL22[2295, "lien"] <- "475.81"        # Replace with the actual lot_size value
+
+ARPL22[3377,]
+ARPL22[3377, "Owner_Name"] <- "KEYS TO WEALTH LIMITED PARTNERSHIP"        # Replace with the actual lot_size value
+ARPL22[3377, "lien"] <- "2438.62"        # Replace with the actual lot_size value
+
+ARPL22[4905,]
+ARPL22[4905, "Owner_Name"] <- "A PLACE TO CALL HOME, INC"
+ARPL22[4905, "lien"] <- "2107.53"        # Replace with the actual lot_size value
+
+ARPL22[6468,]
+ARPL22[6468, "Owner_Name"] <- "KEYS TO WEALTH,LP"        # Replace with the actual lot_size value
+ARPL22[6468, "lien"] <- "967.01"        # Replace with the actual lot_size value
+
+
+write.csv(ARPL22, "data pdf/2022-Tax-sale.csv", row.names = FALSE)
+
+
+
+```
+
+
+# 2021
+
+```{r}
+ARPL21 <-read.csv("data pdf/2021-Tax-sale.csv")
+
+#ARPL21 <-df
+
+```
+
+first I'll check how many NA are there to be fixed?
+
+```{r}
+sum(is.na(ARPL21))
+NAlist<-ARPL21[!complete.cases(ARPL21), ]
+NAlist
+
+ARPL21[2434,]
+ARPL21[2434, "Owner_Name"] <- "HOWES TO HOMES LLC"        
+ARPL21[2434, "lien"] <- "583.97"   
+
+ARPL21[5284,]
+ARPL21[5284, "Owner_Name"] <- "A PLACE TO CALL HOME, INC"        
+ARPL21[5284, "lien"] <- "2637.92"
+
+ARPL21[5659,]
+ARPL21[5659, "Owner_Name"] <- "1125 DESOTO ROAD, LLC"        
+ARPL21[5659, "lien"] <- "9302.21"
+
+ARPL21[7938,]
+ARPL21[7938, "Owner_Name"] <- "CASTRO, ARISTO BULO"        
+ARPL21[7938, "lien"] <- "837.00"
+
+ARPL21[10440,]
+ARPL21[10440, "Owner_Name"] <- "KEYS TO WEALTH LIMITED PARTNERSHIP"        
+ARPL21[10440, "lien"] <- "2354.98"
+
+ARPL21[11000,]
+ARPL21[11000, "Owner_Name"] <- "WONG, KWOK TO CHENG, YEN WAN"        
+ARPL21[11000, "lien"] <- "405.46"
+
+ARPL21[11026,]
+ARPL21[11026, "Owner_Name"] <- "COMMUNITIES ORGANIZED TO IMPROVE LIFE COMMUNITY ECONOMIC DEV"        
+ARPL21[11026, "lien"] <- "173176.10"
+
+ARPL21[11041,]
+ARPL21[11041, "Owner_Name"] <- "COMMUNITIES ORGANIZED TO IMPROVE LIFE COMMUNITY ECONOMIC DEV"        
+ARPL21[11041, "lien"] <- "236976.16"
+
+ARPL21[12809,]
+ARPL21[12809, "Owner_Name"] <- "COMMUNITIES ORGANIZED TO IMPROVE LIFE COMMUNITY ECONOMIC DEV"        
+ARPL21[12809, "lien"] <- "209210.90"
+
+ARPL21[13590,]
+ARPL21[13590, "Owner_Name"] <- "A PLACE TO CALL HOME INC"        
+ARPL21[13590, "lien"] <- "976.74"
+
+ARPL21[15039,]
+ARPL21[15039, "Owner_Name"] <- "A PLACE TO CALL HOME INC"        
+ARPL21[15039, "lien"] <- "290.00"
+
+ARPL21[15940,]
+ARPL21[15940, "Owner_Name"] <- "BACK TO THE BIBLE APOLTOLIC FAITH CHURCH"
+ARPL21[15940, "lien"] <- "527224.95"
+
+ARPL21[16094,]
+ARPL21[16094, "Owner_Name"] <- "A PLACE TO CALL HOME INC"       
+ARPL21[16094, "lien"] <- "3668.54"
+
+ARPL21[16096,]
+ARPL21[16096, "Owner_Name"] <- "A PLACE TO CALL HOME INC"       
+ARPL21[16096, "lien"] <- "1881.92"
+
+ARPL21[19530,]
+ARPL21[19530, "Owner_Name"] <- "START TO FINISH REALTY, LLC"        
+ARPL21[19530, "lien"] <- "917.96"
+
+ARPL21[19624,]
+ARPL21[19624, "Owner_Name"] <- "KEYS TO WEALTH, LP"        
+ARPL21[19624, "lien"] <- "830.98"
+
+ARPL21[20134,]
+ARPL21[20134, "Owner_Name"] <- "MEANS TO MAKE MOORE LLC"        
+ARPL21[20134, "lien"] <- "5024.16"
+
+ARPL21[20157,]
+ARPL21[20157, "Owner_Name"] <- "KEYS TO WEALTH LIMITED PARTNERSHIP"        
+ARPL21[20157, "lien"] <- "530.28"
+
+
+```
+now check which one has a problem in lien
+
+```{r}
+
+APRL21$lien <- gsub(",", "", APRL21$lien)
+APRL21$lien <- trimws(APRL21$lien)
+
+
+probemati<- grepl("^-?([0-9]+(\\.[0-9]+)?|\\.[0-9]+)$", APRL21$lien)
+
+ARPL21[!probemati, ]
+
+ARPL21[6331, "lien"] <- "4154.35"        # Replace with the actual lot_size value
+
+
+ARPL21[20563,"Count"] <-"20563"
+ARPL21[20563, "Address"] <- "2807-2841 EDGECOMBE CIRCLE SOUTH" # Replace with the   
+ARPL21[20563, "block_lot"] <- "3350D-70"  # Replace with the actual block_lot value
+ARPL21[20563, "lot_size"] <- "0.913"        # Replace with the actual lot_size value
+ARPL21[20563, "Owner_Name"] <- "SUTTON, BERTHA F SUTTON, STAFFORD B "        # Replace with the actual lot_size value
+ARPL21[20563, "assessed_value"] <- "39,700"        # Replace with the actual lot_size value
+ARPL21[20563, "lien"] <- "1176.16"        # Replace with the actual lot_size value
+
+
+
+```
+
+save the correct file
+```{r}
+write.csv(ARPL21, "data pdf/2021-Tax-sale.csv", row.names = FALSE)
+
+```
+
+#2020
+
+```{r}
+ARPL20 <-read.csv("data pdf/2020-Tax-sale.csv")
+
+#ARPL21 <-df
+
+```
+
+Fix NA
+
+```{r}
+sum(is.na(ARPL20))
+NAlist<-ARPL20[!complete.cases(ARPL20), ]
+NAlist
+
+ARPL20[2832,]
+ARPL20[2832, "Owner_Name"] <- "TO BEEF OR NOT TO BEEF, LLC"        
+ARPL20[2832, "lien"] <- "814.74"   
+
+ARPL20[2980,]
+ARPL20[2980, "Owner_Name"] <- "TRUTH TO NEW LIFE APOSTOLIC POST RELEASE CENTER AND OUTREACH"        
+ARPL20[2980, "lien"] <- "20845.97"
+
+ARPL20[3096,]
+ARPL20[3096, "Owner_Name"] <- "1125 DESOTO ROAD, LLC"        
+ARPL20[3096, "lien"] <- "13101.88"
+
+ARPL20[5262,]
+ARPL20[5262, "Owner_Name"] <- "DARE TO CARE TOO, LLC"        
+ARPL20[5262, "lien"] <- "2499.58"
+
+ARPL20[6660,]
+ARPL20[6660, "Owner_Name"] <- "UP TO DATE HOME IMPROVEMENT & INVESTMENT, LLC"        
+ARPL20[6660, "lien"] <- "556.78"
+
+ARPL20[8444,]
+ARPL20[8444, "Owner_Name"] <- "A PLACE TO CALL HOME, INC"        
+ARPL20[8444, "lien"] <- "1058.00"
+
+ARPL20[11471,]
+ARPL20[11471, "Owner_Name"] <-"MEANS TO MAKE MOORE,LLC"        
+ARPL20[11471, "lien"] <- "4881.44"
+
+```
+where code failed to seperate lines
+
+```{r}
+
+
+ARPL20$lien <- gsub(",", "", ARPL20$lien)
+ARPL20$lien <- trimws(ARPL20$lien)
+
+
+probemati<- grepl("^-?([0-9]+(\\.[0-9]+)?|\\.[0-9]+)$", ARPL20$lien)
+
+ARPL20[!probemati, ]
+
+
+3459
+
+ARPL20[3459, ]        # Replace with the actual lot_size value
+
+ARPL20[3459, "lien"] <- "829.74"        # Replace with the actual lot_size value
+
+
+
+ARPL20[11653, ]        # Replace with the actual lot_size value
+
+ARPL20[11653, "lien"] <- "477.80"        # Replace with the actual lot_size value
+
+
+ARPL20[11715,"Count"] <-"11715"
+ARPL20[11715, "Address"] <- "2807-2841 EDGECOMBE CIRCLE SOUTH" # Replace with the   
+ARPL20[11715, "block_lot"] <- "3350D-70"  # Replace with the actual block_lot value
+ARPL20[11715, "lot_size"] <- "0.913"        # Replace with the actual lot_size value
+ARPL20[11715, "Owner_Name"] <- "SUTTON, BERTHA F SUTTON, STAFFORD B"        # Replace with the actual lot_size value
+ARPL20[11715, "assessed_value"] <- "39,700"        # Replace with the actual lot_size value
+ARPL20[11715, "lien"] <- "4095.76"        # Replace with the actual lot_size value
+
+
+
+ARPL20[11716,"Count"] <-"11716"
+ARPL20[11716, "Address"] <- "616 W 34TH ST" # Replace with the   
+ARPL20[11716, "block_lot"] <- "3671-52"  # Replace with the actual block_lot value
+ARPL20[11716, "lot_size"] <- "12-6X90"        # Replace with the actual lot_size value
+ARPL20[11716, "Owner_Name"] <- "CHANDLER, PAUL E"        # Replace with the actual lot_size value
+ARPL20[11716, "assessed_value"] <- "$182,500 "        # Replace with the actual lot_size value
+ARPL20[11716, "lien"] <- "779.48"        # Replace with the actual lot_size value
+
+
+
+
+```
+
+
+save the fixed file
+```{r}
+write.csv(ARPL20, "data pdf/2020-Tax-sale.csv", row.names = FALSE)
+
+```
+
+# 2019
+
+read the file
+```{r}
+ARPL19 <-read.csv("data pdf/2019-Tax-sale.csv")
+#ARPL19 <- 
+
+```
+
+
+Fix NA
+
+```{r}
+sum(is.na(ARPL19))
+NAlist<-ARPL19[!complete.cases(ARPL19), ]
+NAlist
+
+ARPL19[4166,]
+ARPL19[4166, "Owner_Name"] <- "REACHING OUT TO HELP YOU WORLDWIDE MINISTRIES, INC"        
+ARPL19[4166, "lien"] <- "794.42"   
+
+ARPL19[5739,]
+ARPL19[5739, "Owner_Name"] <- "LORD, JACINTO ARNOLD"        
+ARPL19[5739, "lien"] <- "92262.53"
+
+ARPL19[6567,]
+ARPL19[6567, "Owner_Name"] <- "HIGHWAY TO HEAVEN OUTREACH MINISTRY, INC."        
+ARPL19[6567, "lien"] <- "537.26"
+
+ARPL19[10149,]
+ARPL19[10149, "Owner_Name"] <- "KEYS TO WEALTH LIMITED PARTNERSHIP"        
+ARPL19[10149, "lien"] <- "3329.06"
+
+ARPL19[11770,]
+ARPL19[11770, "Owner_Name"] <- "UP TO DATE HOME IMPROVEMENT & INVESTMENT, LLC"        
+ARPL19[11770, "lien"] <- "1721.44"
+
+ARPL19[12547,]
+ARPL19[12547, "Owner_Name"] <- "COMMUNITIES ORGANIZED TO IMPROVE LIFE COMMUNITY ECONOMIC DEV"        
+ARPL19[12547, "lien"] <- "2867.10"
+
+ARPL19[13210,]
+ARPL19[13210, "Owner_Name"] <-"MEANS TO MAKE MOORE,LLC"        
+ARPL19[13210, "lien"] <- "39206.38"
+
+
+ARPL19[14001,]
+ARPL19[14001, "Owner_Name"] <- "KEYS TO WEALTH LIMITED PARTNERSHIP"        
+ARPL19[14001, "lien"] <- "50032.33"   
+
+
+ARPL19[17657,]
+ARPL19[17657, "Owner_Name"] <- "1101 ST PAUL #2304 LLC"        
+ARPL19[17657, "lien"] <- "317.88"   
+
+
+ARPL19[19518,]
+ARPL19[19518, "Owner_Name"] <- "DARE TO CARE TOO, LLC"        
+ARPL19[19518, "lien"] <- "2459.77"   
+
+
+ARPL19[19835,]
+ARPL19[19835, "Owner_Name"] <- "KEYS TO WEALTH LIMITED PARTNERSHIP"        
+ARPL19[19835, "lien"] <- "800.98"   
+
+```
+
+
+save the correct file
+```{r}
+write.csv(ARPL19, "data pdf/2019-Tax-sale.csv", row.names = FALSE)
+
+```
+
+
+
+# 2018
+
+```{r}
+ARPL18 <-read.csv("data pdf/2018-Tax-sale.csv")
+ARPL18 <-df
+
+```
+
+
+
+Fix NA
+
+```{r}
+sum(is.na(ARPL18))
+NAlist<-ARPL19[!complete.cases(ARPL19), ]
+NAlist
+
+ARPL19[4166,]
+ARPL19[4166, "Owner_Name"] <- "REACHING OUT TO HELP YOU WORLDWIDE MINISTRIES, INC"        
+ARPL19[4166, "lien"] <- "794.42"   
+
+ARPL19[5739,]
+ARPL19[5739, "Owner_Name"] <- "LORD, JACINTO ARNOLD"        
+ARPL19[5739, "lien"] <- "92262.53"
+
+ARPL19[6567,]
+ARPL19[6567, "Owner_Name"] <- "HIGHWAY TO HEAVEN OUTREACH MINISTRY, INC."        
+ARPL19[6567, "lien"] <- "537.26"
+
+ARPL19[10149,]
+ARPL19[10149, "Owner_Name"] <- "KEYS TO WEALTH LIMITED PARTNERSHIP"        
+ARPL19[10149, "lien"] <- "3329.06"
+
+ARPL19[11770,]
+ARPL19[11770, "Owner_Name"] <- "UP TO DATE HOME IMPROVEMENT & INVESTMENT, LLC"        
+ARPL19[11770, "lien"] <- "1721.44"
+
+ARPL19[12547,]
+ARPL19[12547, "Owner_Name"] <- "COMMUNITIES ORGANIZED TO IMPROVE LIFE COMMUNITY ECONOMIC DEV"        
+ARPL19[12547, "lien"] <- "2867.10"
+
+ARPL19[13210,]
+ARPL19[13210, "Owner_Name"] <-"MEANS TO MAKE MOORE,LLC"        
+ARPL19[13210, "lien"] <- "39206.38"
+
+
+ARPL19[14001,]
+ARPL19[14001, "Owner_Name"] <- "KEYS TO WEALTH LIMITED PARTNERSHIP"        
+ARPL19[14001, "lien"] <- "50032.33"   
+
+
+ARPL19[17657,]
+ARPL19[17657, "Owner_Name"] <- "1101 ST PAUL #2304 LLC"        
+ARPL19[17657, "lien"] <- "317.88"   
+
+
+ARPL19[19518,]
+ARPL19[19518, "Owner_Name"] <- "DARE TO CARE TOO, LLC"        
+ARPL19[19518, "lien"] <- "2459.77"   
+
+
+ARPL19[19835,]
+ARPL19[19835, "Owner_Name"] <- "KEYS TO WEALTH LIMITED PARTNERSHIP"        
+ARPL19[19835, "lien"] <- "800.98"   
+
+```
+
+
+save the fixed file
+```{r}
+write.csv(ARPL18, "data pdf/2018-Tax-sale.csv", row.names = FALSE)
+
+```

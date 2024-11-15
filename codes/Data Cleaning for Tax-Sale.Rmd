@@ -1,0 +1,692 @@
+---
+title: "Data Cleaning for Tax-Sale"
+output: html_notebook
+---
+
+Abbervations
+
+FBLN : Final Bill and Legal Notice
+ARPL : Tax Sale Property List 
+AR:  Auction Result
+
+loading required libraries
+```{r}
+library(readxl)
+#install.packages("openxlsx")
+library(openxlsx)
+library(dplyr)
+library(tidyverse) # for seprate 
+
+library(stringr) # for padding
+
+```
+ 
+
+
+## 2024 data into one file  
+
+
+```{r}
+## read data 
+FBLN24 <- read.xlsx("2024 FBLNs 2-6-24.xlsx")
+AR24 <- read.xlsx("2024 Tax Sale Auction Results - FINAL.xlsx")
+ARPL24 <-read.csv("data pdf/2024-Tax-sale.csv")
+
+```
+
+### creating block_lot identification variable based on block and lot
+
+
+ First working on FBLN file 
+```{r}
+
+    FBLN24$block_lot <- paste0(FBLN24$BLOCK,FBLN24$LOT)
+    FBLN24$block_lot <- gsub( " ", "", FBLN24$block_lot)
+    
+```
+
+on AR file
+
+``` {r}
+
+    AR24$block_lot <-paste0(AR24$BLOCK, AR24$LOT)
+    AR24$block_lot <- gsub( " ", "", AR24$block_lot)
+    
+    
+```
+
+on ARPL file
+
+```{r}
+
+
+# Separate the column into "Lot" and "Block"
+ARPL24 <- ARPL24 %>%
+  mutate(block_lot_copy= block_lot) %>% 
+  separate(block_lot_copy, into = c("BLOCK", "LOT"), sep = "-")
+
+
+# Separate numeric and non-numeric parts, pad the numbers to three digits, and recombine
+ARPL24 <- ARPL24 %>%
+  mutate(
+    LOT = ifelse(
+    str_detect(LOT, "^[0-9]+[A-Za-z]$"),  # Check if LOT contains a number followed by a letter
+    paste0(str_pad(str_extract(LOT, "^[0-9]+"), width = 3, pad = "0"), str_extract(LOT, "[A-Za-z]$")),
+    str_pad(LOT, width = 3, side = "left", pad = "0")  # For pure numbers, pad to three digits
+  ),
+    BLOCK = ifelse(
+    str_detect(BLOCK, "^[0-9]+[A-Za-z]$"),  # Check if Block contains a number followed by a letter
+    paste0(str_pad(str_extract(BLOCK, "^[0-9]+"), width = 4, pad = "0"), str_extract(BLOCK, "[A-Za-z]$")),
+    str_pad(BLOCK, width = 4, side = "left", pad = "0")  # For pure numbers, pad to three digits
+
+    )
+  
+  )
+
+
+
+ARPL24$block_lot <-paste0(ARPL24$BLOCK, ARPL24$LOT)
+
+
+
+```
+###  indicator for merged files FBLN  for houses that ended up in tax sale based on tax sale dataset
+
+```{r}
+
+  # 
+    FBLN24$For_Sale_in_TaxSale <- FBLN24$block_lot %in% AR24$block_lot
+    table(FBLN24$For_Sale_in_TaxSale) # Check if they numbers match the observation
+    FBLN24$NewsPaparNotice <- FBLN24$block_lot %in% ARPL24$block_lot
+    table(FBLN24$NewsPaparNotice) # Check if they numbers match the observation
+
+    
+    
+```
+### Merge data  
+
+```{r}
+   # now merge the dataset 
+    D24 <- merge(FBLN24, AR24, by = "block_lot", all.x = TRUE)
+    D24 <- merge(D24, ARPL24, by = "block_lot", all.x = TRUE)
+
+   # create a year variable
+    D24$YEAR<- 2024
+   # remove un merged data set 
+    
+```
+   
+### select variables that I need
+
+```{r}
+    D24 <- D24 %>%  select ("block_lot","BLOCK.x", "LOT.x" ,  "DISTRICT"  , "NAME"  , "PROPERTY.ADDRESS"  , "ZIP", "ASSESSED.VALUE" ,    
+                               "LIEN.AMOUNT"  ,  "DEED.DATE" ,   "HOME.IND"    , "VACANT.IND" , "YEARS.OWNED"  ,   
+                              "NEIGHBORHOOD", "For_Sale_in_TaxSale", "NewsPaparNotice",
+                              "LOT-SIZE" ,"CERT-NUM" , "TOTAL-LIENS",   "AMT-BID", "BALANCE", "BIDDER-TYPE" ,"BIDDER-NUM" ,
+                               "BIDDER-NAME"  ,   "BIDDER-STATE",
+                              "RP-ZONE"       , 
+                               "RP-COUN-DIST" ,    "lien", "YEAR")
+
+
+
+
+```
+rename variables
+```{r}
+
+D24 <- D24 %>% 
+  rename(
+    BLOCK_LOT = "block_lot",
+    BLOCK = "BLOCK.x", 
+    LOT = "LOT.x", 
+    OWNER_NAME = "NAME",  
+    PROPERTY_ADDRESS = "PROPERTY.ADDRESS",  
+    ASSESSED_VALUE = "ASSESSED.VALUE",    
+    LIEN_1 = "LIEN.AMOUNT",  
+    DEED_DATE = "DEED.DATE",   
+    HOME_IND = "HOME.IND",    
+    VACANT_IND = "VACANT.IND", 
+    YEARS_OWNED = "YEARS.OWNED",   
+    NEIGHBORHOOD = "NEIGHBORHOOD", 
+    FORSALE_TAXSALE = "For_Sale_in_TaxSale", 
+    NEW_PAPER_NOTICE = "NewsPaparNotice",
+    LOT_SIZE = "LOT-SIZE",
+    CERT_NUM = "CERT-NUM", 
+    LIEN_3 = "TOTAL-LIENS",   
+    AMT_BID = "AMT-BID", 
+    BALANCE = "BALANCE", 
+    BIDDER_TYPE = "BIDDER-TYPE",
+    BIDDER_NUM = "BIDDER-NUM",
+    BIDDER_NAME = "BIDDER-NAME",   
+    BIDDER_STATE = "BIDDER-STATE",
+    RP_ZONE = "RP-ZONE",       
+    RP_COUN_DIST = "RP-COUN-DIST",    
+    LIEN_2 = "lien"
+  )
+
+
+
+
+```
+    
+    
+```{r}
+rm(FBLN24,AR24, ARPL24)
+
+```
+
+  
+## 2023 data into one file  ###
+
+#### read data 
+
+```{r}
+ 
+    
+  FBLN23 <- read.xlsx("all FBLN properties 2023.xlsx")
+  AR23 <- read.xlsx("2023 Tax Sale Results-with bidder information.xlsx")
+  ARPL23 <-read.csv("data pdf/2023-Tax-sale.csv")
+
+```
+
+
+#### create block-lot key 
+
+
+```{r}
+  # creating block_lot identification variable based on block and lot
+  
+    FBLN23$block_lot <- paste0(FBLN23$BLOCK,FBLN23$LOT)
+    FBLN23$block_lot <- gsub( " ", "", FBLN23$block_lot)
+
+```
+
+        ## in AR23 the format of Block 00 in the begining dropped needed to be fixed
+```{r}
+    AR23$BLOCK <- str_pad(AR23$BLOCK, width = 4, side = "left", pad = "0")
+    AR23$LOT <- str_pad(AR23$LOT, width = 3, side = "left", pad = "0")
+    AR23$block_lot <-paste0(AR23$BLOCK, AR23$LOT)
+    
+```
+    
+
+```{r}
+
+
+# Separate the column into "Lot" and "Block"
+ARPL23 <- ARPL23 %>%
+  mutate(block_lot_copy= block_lot) %>% 
+  separate(block_lot_copy, into = c("BLOCK", "LOT"), sep = "-")
+
+
+# Separate numeric and non-numeric parts, pad the numbers to three digits, and recombine
+ARPL23 <- ARPL23 %>%
+  mutate(
+    LOT = ifelse(
+    str_detect(LOT, "^[0-9]+[A-Za-z]$"),  # Check if LOT contains a number followed by a letter
+    paste0(str_pad(str_extract(LOT, "^[0-9]+"), width = 3, pad = "0"), str_extract(LOT, "[A-Za-z]$")),
+    str_pad(LOT, width = 3, side = "left", pad = "0")  # For pure numbers, pad to three digits
+  ),
+    BLOCK = ifelse(
+    str_detect(BLOCK, "^[0-9]+[A-Za-z]$"),  # Check if Block contains a number followed by a letter
+    paste0(str_pad(str_extract(BLOCK, "^[0-9]+"), width = 4, pad = "0"), str_extract(BLOCK, "[A-Za-z]$")),
+    str_pad(BLOCK, width = 4, side = "left", pad = "0")  # For pure numbers, pad to three digits
+
+    )
+  
+  )
+
+
+
+ARPL23$block_lot <-paste0(ARPL23$BLOCK, ARPL23$LOT)
+
+
+
+```
+
+###  indicator for merged files FBLN  for houses that ended up in tax sale based on tax sale dataset
+
+
+```{r}
+    FBLN23$For_Sale_in_TaxSale <- FBLN23$block_lot %in% AR23$block_lot
+    table(FBLN23$For_Sale_in_TaxSale) 
+    FBLN23$NewsPaparNotice <- FBLN23$block_lot %in% ARPL23$block_lot
+    table(FBLN23$NewsPaparNotice) 
+
+
+```
+### Merge data
+
+    ```{r}
+    # now merge the dataset 
+    D23 <- merge(FBLN23, AR23, by = "block_lot", all.x = TRUE)
+    D23 <- merge(D23, ARPL23, by = "block_lot", all.x = TRUE)
+
+    # create a year variable
+    D23$YEAR<- 2023
+    # remove un merged data set 
+    rm(FBLN23,AR23,ARPL23)
+```
+
+### select variables that I need 
+
+the assessed value was not availble in FBLS data of 2023 thus the assess value in the merged data is coming from newspaper files and therefore there will be about 8000 observation missing. Additionaly the neighborhood variable is not available as well. Since I will need this variable later on I will create this variable now with NA values. in order to make mergeing possible.
+```{r}
+    D23$NEIGHBORHOOD<- NA
+
+
+```
+
+
+
+```{r}
+
+    D23 <- D23 %>%  select ("block_lot","BLOCK.x", "LOT.x" ,  "DISTRICT"  , "NAME"  , "PROPERTY.ADDRESS"  , "ZIP", "assessed_value" ,    
+                               "LIEN.AMOUNT"  ,  "DEED.DATE" ,   "HOME.IND"    , "VACANT.IND" , "YEARS.OWNED"  ,   
+                              "NEIGHBORHOOD", "For_Sale_in_TaxSale", "NewsPaparNotice",
+                              "LOT-SIZE" ,"CERT-NUM" , "TOTAL-LIENS",   "AMT-BID", "Balance", "BIDDER-TYPE" ,"BIDDER-NUM" ,
+                               "BIDDER-NAME"  ,   "BIDDER-STATE",
+                              "RP-ZONE"       , 
+                               "RP-COUN-DIST" ,    "lien", "YEAR")
+
+
+
+
+```
+
+rename variables
+```{r}
+
+D23 <- D23 %>% 
+  rename(
+    BLOCK_LOT = "block_lot",
+    BLOCK = "BLOCK.x", 
+    LOT = "LOT.x", 
+    OWNER_NAME = "NAME",  
+    PROPERTY_ADDRESS = "PROPERTY.ADDRESS",  
+    ASSESSED_VALUE = "assessed_value",    
+    LIEN_1 = "LIEN.AMOUNT",  
+    DEED_DATE = "DEED.DATE",   
+    HOME_IND = "HOME.IND",    
+    VACANT_IND = "VACANT.IND", 
+    YEARS_OWNED = "YEARS.OWNED",   
+    NEIGHBORHOOD = "NEIGHBORHOOD", 
+    FORSALE_TAXSALE = "For_Sale_in_TaxSale", 
+    NEW_PAPER_NOTICE = "NewsPaparNotice",
+    LOT_SIZE = "LOT-SIZE",
+    CERT_NUM = "CERT-NUM", 
+    LIEN_3 = "TOTAL-LIENS",   
+    AMT_BID = "AMT-BID", 
+    BALANCE = "Balance", 
+    BIDDER_TYPE = "BIDDER-TYPE",
+    BIDDER_NUM = "BIDDER-NUM",
+    BIDDER_NAME = "BIDDER-NAME",   
+    BIDDER_STATE = "BIDDER-STATE",
+    RP_ZONE = "RP-ZONE",       
+    RP_COUN_DIST = "RP-COUN-DIST",    
+    LIEN_2 = "lien"
+  )
+
+
+
+
+```
+  
+
+```{r}
+
+    #AR23 <- AR23 %>%     
+        #rename( BALANCE = Balance  ) %>%
+     #   select ("LOT-SIZE", "CERT-NUM" , "TOTAL-LIENS",   "AMT-BID", "BALANCE",   "TAXBASE", "BIDDER-TYPE" ,"BIDDER-NUM" ,
+                       #       "BIDDER-NAME"  ,    "BIDDER-ADDR",
+                      #        "BIDDER-CITY"  ,    "BIDDER-STATE",
+                        #      "BIDDER-ZIP-CODE",  "BIDDER-PHONE",
+                        #      "VH-FLAG"      ,    "OCC-FLAG",
+                         #     "RP-ZONE"       ,   "RP-DEED-DATE",
+                         #     "RP-COUN-DIST" ,    "block_lot")
+    ```
+    
+
+
+
+
+
+
+
+
+## NEED WORK 2022 data data into one file 
+
+There is no FBLS data for this year probably need to ask Micheal
+   
+```{r}
+    
+# read data 
+    
+FBLN22 <- read.xlsx("2022 TheRecord-20220519.xlsx")
+AR22 <- read.xlsx("2022 Tax Sale Results.xlsx")
+ARPL22 <-read.csv("data pdf/2022-Tax-sale.csv")
+
+```
+ 
+```{r}
+ 
+  # creating block_lot identification variable based on block and lot
+    FBLN22$block_lot <- paste0(FBLN22$Block,FBLN22$Lot)
+    FBLN22$block_lot <- gsub( " ", "", FBLN22$block_lot)
+    
+    AR22$block_lot <-paste0(AR22$BLOCK, AR22$LOT)
+    AR22$block_lot <- gsub( " ", "", AR22$block_lot)
+  # create a dummy variable in FBLN  for houses that ended up in tax sale based on tax sale dataset
+    FBLN22$For_Sale_in_TaxSale <- FBLN22$block_lot %in% AR22$block_lot
+    table(FBLN22$For_Sale_in_TaxSale )
+    
+  # now merge the dataset 
+    D22 <- merge(FBLN22, AR22, by = "block_lot", all.x = TRUE)
+  # create a year variable
+    D22$YEAR<- 2022
+    
+  # remove un merged data set 
+    rm(FBLN22,AR22, ARPL22)
+```
+
+
+## 2021  data into one file  ###
+
+```{r}
+
+# read data 
+  FBLN21 <- read.xlsx("tax_sale_advertised_2021-03-15.xlsx")
+  AR21 <- read.csv("2021_Tax_Sale_List_(With_Exempted_Properties).csv")
+  ARPL21 <-read.csv("data pdf/2021-Tax-sale.csv")
+
+```
+ 
+### creating block_lot identification variable based on block and lot
+
+On FBLS file    
+
+```{r}
+ 
+  # creating block_lot identification variable based on block and lot
+  
+    FBLN21$block_lot <- paste0(FBLN21$Block,FBLN21$Lot)
+    FBLN21$block_lot <- gsub( " ", "", FBLN21$block_lot)
+    
+```
+
+On AR file 
+```{r}
+
+    AR21 <- AR21 %>% rename(block_lot = pin) # identification already exist just need to be renamed
+
+```
+
+
+
+on ARPL file
+
+```{r}
+
+
+# Separate the column into "Lot" and "Block"
+ARPL21 <- ARPL21 %>%
+  mutate(block_lot_copy= block_lot) %>% 
+  separate(block_lot_copy, into = c("BLOCK", "LOT"), sep = "-")
+
+
+# Separate numeric and non-numeric parts, pad the numbers to three digits, and recombine
+ARPL21 <- ARPL21 %>%
+  mutate(
+    LOT = ifelse(
+    str_detect(LOT, "^[0-9]+[A-Za-z]$"),  # Check if LOT contains a number followed by a letter
+    paste0(str_pad(str_extract(LOT, "^[0-9]+"), width = 3, pad = "0"), str_extract(LOT, "[A-Za-z]$")),
+    str_pad(LOT, width = 3, side = "left", pad = "0")  # For pure numbers, pad to three digits
+  ),
+    BLOCK = ifelse(
+    str_detect(BLOCK, "^[0-9]+[A-Za-z]$"),  # Check if Block contains a number followed by a letter
+    paste0(str_pad(str_extract(BLOCK, "^[0-9]+"), width = 4, pad = "0"), str_extract(BLOCK, "[A-Za-z]$")),
+    str_pad(BLOCK, width = 4, side = "left", pad = "0")  # For pure numbers, pad to three digits
+
+    )
+  
+  )
+
+
+
+ARPL21$block_lot <-paste0(ARPL21$BLOCK, ARPL21$LOT)
+
+```
+    
+### indicator variable in FBLN  for houses that ended up in tax sale based on tax sale dataset
+
+```{r}
+    FBLN21$For_Sale_in_TaxSale <- FBLN21$block_lot %in% AR21$block_lot
+    table(FBLN21$For_Sale_in_TaxSale)
+    FBLN21$NewsPaparNotice <- FBLN21$block_lot %in% ARPL21$block_lot
+    table(FBLN21$NewsPaparNotice)
+
+    
+```
+
+
+### Merge the dataset 
+
+```{r}
+
+    D21 <- merge(FBLN21, AR21, by = "block_lot", all.x = TRUE)
+    D21 <- merge(D21, ARPL21, by = "block_lot", all.x = TRUE)
+
+ # year variable already exist 
+ # remove un merged data set 
+    rm(FBLN21,AR21, ARPL21)
+    
+```
+
+### select variables that I need 
+
+```{r}
+
+D21$PROPERTY.ADDRESS <- paste(ifelse(is.na(D21$House), "", D21$House),
+                              ifelse(is.na(D21$Dir), "", D21$Dir),
+                              ifelse(is.na(D21$Address.x), "", D21$Address.x),
+                              ifelse(is.na(D21$Unit), "", paste("Unit#:", D21$Unit))
+                              )
+
+D21$YEAR<-2021
+
+
+```
+
+District and Neighborhood weren't available from FBLS file so I use AR file for it. same for deed date
+
+There is no zip code available I might need to drop zip from all the data before or create NA for this 
+YEARS.OWNED is not also available, I'm guessing it could be created from deed date and year later on but that needs to be checked
+CERT Num might be needed to removed for all other years as well. 
+
+so Item removed are :
+
+"YEARS.OWNED"
+"CERT-NUM" 
+ "AMT-BID"
+"Balance"
+"BIDDER-NUM" 
+ "BIDDER-NAME"  ,  
+ "BIDDER-STATE",
+ "RP-ZONE"       
+ "RP-COUN-DIST" 
+"ZIP"
+
+```{r}
+
+    D21 <- D21 %>%  select ("block_lot","Block", "Lot" ,  "council_di"  , "Asst.To"  , "PROPERTY.ADDRESS"  , "Assessment" ,    
+                               "Lien.Amount"  ,  "deed_date" ,   "Occupied"    , "Vacant" ,   
+                              "neighborho", "For_Sale_in_TaxSale", "NewsPaparNotice",
+                              "Lot.Size" , "total_lien", "soldto" ,
+                                "lien", "YEAR")
+
+
+
+
+```
+
+rename variables
+```{r}
+
+D21 <- D21 %>% 
+  rename(
+    BLOCK_LOT = "block_lot",
+    BLOCK = "Block", 
+    LOT = "Lot", 
+    DISTRICT="council_di"
+    OWNER_NAME = "Asst.To",  
+    PROPERTY_ADDRESS = "PROPERTY.ADDRESS",  
+    ASSESSED_VALUE = "Assessment",    
+    LIEN_1 = "Lien.Amount",  
+    DEED_DATE = "deed_date",   
+    HOME_IND = "Occupied",    
+    VACANT_IND = "Vacant", 
+   # YEARS_OWNED = "YEARS.OWNED",   
+    NEIGHBORHOOD = "neighborho", 
+    FORSALE_TAXSALE = "For_Sale_in_TaxSale", 
+    NEW_PAPER_NOTICE = "NewsPaparNotice",
+    LOT_SIZE = "Lot.Size",
+   # CERT_NUM = "CERT-NUM", 
+    LIEN_3 = "total_lien",   
+    #AMT_BID = "AMT-BID", 
+   # BALANCE = "Balance", 
+    BIDDER_TYPE = "soldto",
+  #  BIDDER_NUM = "BIDDER-NUM",
+  #  BIDDER_NAME = "BIDDER-NAME",   
+# BIDDER_STATE = "BIDDER-STATE",
+  #  RP_ZONE = "RP-ZONE",       
+  #  RP_COUN_DIST = "RP-COUN-DIST",    
+    LIEN_2 = "lien"
+  )
+
+
+
+
+```
+  
+
+```{r}
+
+    #AR23 <- AR23 %>%     
+        #rename( BALANCE = Balance  ) %>%
+     #   select ("LOT-SIZE", "CERT-NUM" , "TOTAL-LIENS",   "AMT-BID", "BALANCE",   "TAXBASE", "BIDDER-TYPE" ,"BIDDER-NUM" ,
+                       #       "BIDDER-NAME"  ,    "BIDDER-ADDR",
+                      #        "BIDDER-CITY"  ,    "BIDDER-STATE",
+                        #      "BIDDER-ZIP-CODE",  "BIDDER-PHONE",
+                        #      "VH-FLAG"      ,    "OCC-FLAG",
+                         #     "RP-ZONE"       ,   "RP-DEED-DATE",
+                         #     "RP-COUN-DIST" ,    "block_lot")
+```
+    
+
+
+
+
+
+
+
+
+
+
+
+
+## 2020 data  is the worst there is block and lot
+```{r}
+
+  AR20 <- read.csv("bidbaltimore_certificate_sale_results_2020.csv")
+  FB20 <- read.csv("bidbaltimore_assignment_sale_results_2020.csv")
+  ARPL20 <-read.csv("data pdf/2020-Tax-sale.csv")
+
+  rm(AR20, FB20, ARPL20)
+
+```
+
+
+## Merge 2019 data 
+
+```{r}
+
+FBLN19 <- read.xlsx("2019 FBLNs - all owner occupieds.xlsx")
+FBLN189 <- read.xlsx("FBLNS_Owner Occupied_PROPERTIES_IN_BOTH_2018_AND_2019.xlsx")
+ARPL19 <-read.csv("data pdf/2019-Tax-sale.csv")
+
+
+```
+
+## Merge 2018 data
+
+
+## Merge 2017 data 
+
+## Merge 2016 data
+
+## Merge 2015 data
+
+## Merge 2014 data 
+
+## Merge 2013 data
+
+
+## Merge 2012 data
+
+
+## Merge 2011 data
+
+
+## Merge 2010 data 
+
+## Merge 2009 
+
+## Merge 2008 data 
+
+## Merge 2007 data 
+
+```{r}
+   
+## Check if the 18 and 19 in FBLN files are different?
+##     
+    FBLN19$block_lot <- paste0(FBLN19$BLOCK,FBLN19$LOT)
+    FBLN19$block_lot <- gsub( " ", "", FBLN19$block_lot)
+    
+     ## numbering in 189 file is different needs to be fixed
+    #library(stringr)
+    FBLN189$BLOCK <- str_pad(FBLN189$BLOCK, width = 4, side = "left", pad = "0")
+    FBLN189$LOT <- str_pad(FBLN189$LOT, width = 3, side = "left", pad = "0")
+    FBLN189$block_lot <- paste0(FBLN189$BLOCK,FBLN189$LOT)
+
+    FBLN189$exists_in_19 <- FBLN189$block_lot %in% FBLN19$block_lot
+    
+    table(FBLN189$exists_in_19)
+## Check if the 18 and 18.2 are the same almost or not
+## 
+    FBLN18$block_lot <- paste0(FBLN18$Block,FBLN18$Lot)
+    FBLN18$block_lot <- gsub( " ", "", FBLN18$block_lot)
+    
+    
+    FBLN182$block_lot <- paste0(FBLN182$BLOCK,FBLN182$LOT)
+    FBLN182$block_lot <- gsub( " ", "", FBLN182$block_lot)
+    
+    FBLN18$exists_in_18 <- FBLN18$block_lot %in% FBLN182$block_lot
+    
+    table(FBLN18$exists_in_1)
+    
+    
+    colnames(FBLN23)
+    colnames(D24)
+    table(FBLN189$OCCUPIED.IND)
+    colnames(FBLN19)
+    table(FBLN18$Owner.Occ)
+    
+    rm(list=ls())
+    
+    ASSESSED.VALUE
+    VACANT.LOT
+    NEIGHBORHOOD
+    table(D24$NEIGHBORHOOD)
+    length(unique(D24$NEIGHBORHOOD))
+    length(unique(NBH$Name))
+    
