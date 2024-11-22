@@ -22,7 +22,7 @@ TS19 <- read_excel("2019 tax sale results.xls")
 TS182 <- read.csv("bidbaltimore_certificate_sale_results_2018.csv")
 TS183 <- read.csv("bidbaltimore_assignment_sale_results_2018.csv")
 
-Data <- read.csv("tax_sale_data.csv")
+Data <- read.csv("data/Tax_Lien_Certificate_Sale_Properties.csv")
 table(All$TAX_SALE_YEAR)
 dat <- read.xlsx("tax_sale_advertised_2021-04-06.xlsx")
 
@@ -119,6 +119,7 @@ TS24 <- read.xlsx("2024 Tax Sale Auction Results - FINAL.xlsx")
 FBLS22 <- read.xlsx("2022 TheRecord-20220519.xlsx")
 TS22 <- read.xlsx("2022 Tax Sale Results.xlsx")
     
+D24<- read.csv("data/D24.csv")
   # creating key identification variable based on block and lot
     FBLS22$key <- paste0(FBLS22$Block,FBLS22$Lot)
     FBLS22$key <- gsub( " ", "", FBLS22$key)

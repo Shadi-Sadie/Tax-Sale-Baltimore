@@ -22,15 +22,29 @@ library(stringr) # for padding
 ```
  
 
+```{r wd-setup, include=FALSE}
+
+wd <- list()
+# commonly used paths in my working directory
+wd$data   <- "/home/shadi/Projects/GitHub/Tax-Sale-Baltimore/data/"
+wd$output <- "/home/shadi/Projects/GitHub/Tax-Sale-Baltimore/output/"
+wd$texts <- "/home/shadi/Projects/GitHub/Tax-Sale-Baltimore/text/"
+wd$codes <- "/home/shadi/Projects/GitHub/Tax-Sale-Baltimore/codes/R/"
+
+```
+
+
+
 
 ## 2024 data into one file  
 
 
 ```{r}
 ## read data 
-FBLN24 <- read.xlsx("2024 FBLNs 2-6-24.xlsx")
-AR24 <- read.xlsx("2024 Tax Sale Auction Results - FINAL.xlsx")
-ARPL24 <-read.csv("data pdf/2024-Tax-sale.csv")
+
+FBLN24 <- read.xlsx(paste0(wd$data,"2024 FBLNs 2-6-24.xlsx"))
+AR24 <- read.xlsx(paste0(wd$data,"2024 Tax Sale Auction Results - FINAL.xlsx"))
+ARPL24 <-read.csv(paste0(wd$data,"data pdf/2024-Tax-sale.csv"))
 
 ```
 
@@ -122,10 +136,9 @@ ARPL24$block_lot <-paste0(ARPL24$BLOCK, ARPL24$LOT)
     D24 <- D24 %>%  select ("block_lot","BLOCK.x", "LOT.x" ,  "DISTRICT"  , "NAME"  , "PROPERTY.ADDRESS"  , "ZIP", "ASSESSED.VALUE" ,    
                                "LIEN.AMOUNT"  ,  "DEED.DATE" ,   "HOME.IND"    , "VACANT.IND" , "YEARS.OWNED"  ,   
                               "NEIGHBORHOOD", "For_Sale_in_TaxSale", "NewsPaparNotice",
-                              "LOT-SIZE" ,"CERT-NUM" , "TOTAL-LIENS",   "AMT-BID", "BALANCE", "BIDDER-TYPE" ,"BIDDER-NUM" ,
-                               "BIDDER-NAME"  ,   "BIDDER-STATE",
-                              "RP-ZONE"       , 
-                               "RP-COUN-DIST" ,    "lien", "YEAR")
+                               "TOTAL-LIENS",   "AMT-BID", "BALANCE", "BIDDER-TYPE" ,"BIDDER-NUM" ,
+                               "BIDDER-NAME"  ,
+                                "lien", "YEAR")
 
 
 
@@ -150,17 +163,12 @@ D24 <- D24 %>%
     NEIGHBORHOOD = "NEIGHBORHOOD", 
     FORSALE_TAXSALE = "For_Sale_in_TaxSale", 
     NEW_PAPER_NOTICE = "NewsPaparNotice",
-    LOT_SIZE = "LOT-SIZE",
-    CERT_NUM = "CERT-NUM", 
     LIEN_3 = "TOTAL-LIENS",   
     AMT_BID = "AMT-BID", 
     BALANCE = "BALANCE", 
     BIDDER_TYPE = "BIDDER-TYPE",
     BIDDER_NUM = "BIDDER-NUM",
     BIDDER_NAME = "BIDDER-NAME",   
-    BIDDER_STATE = "BIDDER-STATE",
-    RP_ZONE = "RP-ZONE",       
-    RP_COUN_DIST = "RP-COUN-DIST",    
     LIEN_2 = "lien"
   )
 
@@ -169,6 +177,39 @@ D24 <- D24 %>%
 
 ```
     
+### add geoid and latititue and longtitute
+
+
+```{r}
+
+subadd <- Rdmp23[1:250, ] 
+
+  
+address<-paste0(trimws(subadd$PROPERTY_ADDRESS), ",Baltimore")
+
+
+geocoded_data <- bind_rows(Map(function(address, block_lot) {
+    geocode_census(address, block_lot = block_lot)
+}, address, subadd$block_lot))
+
+merged_data <- merge(subadd, geocoded_data, by = "block_lot")
+
+
+subadd<-cbind(subadd,geocoded_data)
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
     
 ```{r}
 rm(FBLN24,AR24, ARPL24)
@@ -183,9 +224,13 @@ rm(FBLN24,AR24, ARPL24)
 ```{r}
  
     
-  FBLN23 <- read.xlsx("all FBLN properties 2023.xlsx")
-  AR23 <- read.xlsx("2023 Tax Sale Results-with bidder information.xlsx")
-  ARPL23 <-read.csv("data pdf/2023-Tax-sale.csv")
+  FBLN23 <- read.xlsx(paste0(wd$data,"all FBLN properties 2023.xlsx"))
+  AR23 <- read.xlsx(paste0(wd$data,"2023 Tax Sale Results-with bidder information.xlsx"))
+  ARPL23 <-read.csv(paste0(wd$data,"data pdf/2023-Tax-sale.csv"))
+  
+  Data <- read.csv(paste0(wd$data,"Tax_Lien_Certificate_Sale_Properties.csv"))
+  Rdmp23<- subset (Data,TAX_SALE_YEAR==2023)
+
 
 ```
 
@@ -209,6 +254,19 @@ rm(FBLN24,AR24, ARPL24)
     
 ```
     
+create a key for redemption file 
+
+```{r}
+  # creating block_lot identification variable based on block and lot
+  
+    Rdmp23$block_lot <- paste0(Rdmp23$BLOCK,Rdmp23$LOT)
+    Rdmp23$block_lot <- gsub( " ", "", Rdmp23$block_lot)
+    
+    Rdmp23$Rdmp23 <- Rdmp23$block_lot %in% AR23$block_lot
+
+
+```
+
 
 ```{r}
 
@@ -362,9 +420,9 @@ There is no FBLS data for this year probably need to ask Micheal
     
 # read data 
     
-FBLN22 <- read.xlsx("2022 TheRecord-20220519.xlsx")
-AR22 <- read.xlsx("2022 Tax Sale Results.xlsx")
-ARPL22 <-read.csv("data pdf/2022-Tax-sale.csv")
+FBLN22 <- read.xlsx(paste0(wd$data,"2022 TheRecord-20220519.xlsx"))
+AR22 <- read.xlsx(paste0(wd$data,"2022 Tax Sale Results.xlsx"))
+ARPL22 <-read.csv(paste0(wd$data,"data pdf/2022-Tax-sale.csv"))
 
 ```
  
@@ -396,7 +454,7 @@ ARPL22 <-read.csv("data pdf/2022-Tax-sale.csv")
 
 # read data 
   FBLN21 <- read.xlsx("tax_sale_advertised_2021-03-15.xlsx")
-  AR21 <- read.csv("2021_Tax_Sale_List_(With_Exempted_Properties).csv")
+  AR21 <- read.csv(paste0(wd$data,"2021_Tax_Sale_List_(With_Exempted_Properties).csv"))
   ARPL21 <-read.csv("data pdf/2021-Tax-sale.csv")
 
 ```
@@ -597,7 +655,7 @@ D21 <- D21 %>%
 ## 2020 data  is the worst there is block and lot
 ```{r}
 
-  AR20 <- read.csv("bidbaltimore_certificate_sale_results_2020.csv")
+  AR20 <- read.csv(paste0(wd$data,"bidbaltimore_certificate_sale_results_2020.csv"))
   FB20 <- read.csv("bidbaltimore_assignment_sale_results_2020.csv")
   ARPL20 <-read.csv("data pdf/2020-Tax-sale.csv")
 
@@ -613,7 +671,7 @@ D21 <- D21 %>%
 FBLN19 <- read.xlsx("2019 FBLNs - all owner occupieds.xlsx")
 FBLN189 <- read.xlsx("FBLNS_Owner Occupied_PROPERTIES_IN_BOTH_2018_AND_2019.xlsx")
 ARPL19 <-read.csv("data pdf/2019-Tax-sale.csv")
-
+AR19<- read.csv(paste0(wd$data,"bidbaltimore_certificate_sale_results_2019.csv"))
 
 ```
 
