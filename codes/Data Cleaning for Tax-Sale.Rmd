@@ -182,7 +182,7 @@ D24 <- D24 %>%
 
 ```{r}
 
-subadd <- Rdmp23[1:250, ] 
+subadd <- D24[1:250, ] 
 
   
 address<-paste0(trimws(subadd$PROPERTY_ADDRESS), ",Baltimore")
@@ -190,7 +190,7 @@ address<-paste0(trimws(subadd$PROPERTY_ADDRESS), ",Baltimore")
 
 geocoded_data <- bind_rows(Map(function(address, block_lot) {
     geocode_census(address, block_lot = block_lot)
-}, address, subadd$block_lot))
+}, address, subadd$BLOCK_LOT))
 
 merged_data <- merge(subadd, geocoded_data, by = "block_lot")
 
@@ -202,8 +202,18 @@ subadd<-cbind(subadd,geocoded_data)
 
 
 
+2024 dosen't have the redemption variable so I should create that but leave it empty since for many years I have it
 
 
+
+
+```{r}
+
+D24$REDEMPTION_DATE <- NA
+D24$REDEMPTION_NAME <- NA
+D24$REDEEMED <- NA
+
+```
 
 
 
@@ -267,6 +277,16 @@ create a key for redemption file
 
 ```
 
+create a variable that shows if a house was redemed or not
+
+```{r}
+Rdmp23$REDEMPTION_NAME <- trimws(Rdmp23$REDEMPTION_NAME)
+
+
+Rdmp23$REDEEMED <- ifelse(Rdmp23$REDEMPTION_NAME == "" , 0, 1 )
+
+```
+
 
 ```{r}
 
@@ -302,6 +322,26 @@ ARPL23$block_lot <-paste0(ARPL23$BLOCK, ARPL23$LOT)
 
 ```
 
+
+
+merge the AR with the redemption file, variable I'm using from redemption file are lien, intrest, redemption date, redemption name, latitude and langtitute.
+
+
+```{r}
+
+# Select specific columns from Rdmp23 (e.g., block_lot, var1, var2)
+
+Rdmp23_subset <- Rdmp23 %>%
+  select(block_lot, REDEMPTION_DATE, REDEMPTION_NAME, REDEEMED )  # Replace var1, var2 with the desired column names
+
+
+AR23 <- merge(Rdmp23_subset, AR23, by = "block_lot")
+
+
+```
+
+
+
 ###  indicator for merged files FBLN  for houses that ended up in tax sale based on tax sale dataset
 
 
@@ -323,7 +363,9 @@ ARPL23$block_lot <-paste0(ARPL23$BLOCK, ARPL23$LOT)
     # create a year variable
     D23$YEAR<- 2023
     # remove un merged data set 
-    rm(FBLN23,AR23,ARPL23)
+    rm(FBLN23,AR23,ARPL23,Rdmp23)
+    
+    
 ```
 
 ### select variables that I need 
@@ -339,13 +381,12 @@ the assessed value was not availble in FBLS data of 2023 thus the assess value i
 
 ```{r}
 
-    D23 <- D23 %>%  select ("block_lot","BLOCK.x", "LOT.x" ,  "DISTRICT"  , "NAME"  , "PROPERTY.ADDRESS"  , "ZIP", "assessed_value" ,    
+        D23 <- D23 %>%  select ("block_lot","BLOCK.x", "LOT.x" ,  "DISTRICT"  , "NAME"  , "PROPERTY.ADDRESS"  , "ZIP",   "assessed_value" ,
                                "LIEN.AMOUNT"  ,  "DEED.DATE" ,   "HOME.IND"    , "VACANT.IND" , "YEARS.OWNED"  ,   
                               "NEIGHBORHOOD", "For_Sale_in_TaxSale", "NewsPaparNotice",
-                              "LOT-SIZE" ,"CERT-NUM" , "TOTAL-LIENS",   "AMT-BID", "Balance", "BIDDER-TYPE" ,"BIDDER-NUM" ,
-                               "BIDDER-NAME"  ,   "BIDDER-STATE",
-                              "RP-ZONE"       , 
-                               "RP-COUN-DIST" ,    "lien", "YEAR")
+                               "TOTAL-LIENS",   "AMT-BID", "Balance", "BIDDER-TYPE" ,"BIDDER-NUM" ,
+                               "BIDDER-NAME"  ,
+                                "lien", "YEAR", "REDEMPTION_DATE","REDEMPTION_NAME", "REDEEMED")
 
 
 
@@ -371,17 +412,12 @@ D23 <- D23 %>%
     NEIGHBORHOOD = "NEIGHBORHOOD", 
     FORSALE_TAXSALE = "For_Sale_in_TaxSale", 
     NEW_PAPER_NOTICE = "NewsPaparNotice",
-    LOT_SIZE = "LOT-SIZE",
-    CERT_NUM = "CERT-NUM", 
     LIEN_3 = "TOTAL-LIENS",   
     AMT_BID = "AMT-BID", 
     BALANCE = "Balance", 
     BIDDER_TYPE = "BIDDER-TYPE",
     BIDDER_NUM = "BIDDER-NUM",
     BIDDER_NAME = "BIDDER-NAME",   
-    BIDDER_STATE = "BIDDER-STATE",
-    RP_ZONE = "RP-ZONE",       
-    RP_COUN_DIST = "RP-COUN-DIST",    
     LIEN_2 = "lien"
   )
 
@@ -410,11 +446,31 @@ D23 <- D23 %>%
 
 
 
+```{r}
+
+subadd <- merged_data[1:250, ] 
+
+  
+address<-paste0(trimws(subadd$`PROPERTY-ADDRESS`), ",Baltimore")
+
+
+geocoded_data <- bind_rows(Map(function(address, block_lot) {
+    geocode_census(address, block_lot = block_lot)
+}, address, subadd$block_lot))
+
+merged_data <- merge(subadd, geocoded_data, by = "block_lot")
+
+subset<- merged_data %>% select (block_lot, LATITUDE ,LONGITUDE, address,`PROPERTY-ADDRESS`, address, latitude, longitude)
+
+subadd<-cbind(subadd,geocoded_data)
+
+```
 
 
 ## NEED WORK 2022 data data into one file 
+There is no owner occupide hous
 
-There is no FBLS data for this year probably need to ask Micheal
+There is no FBLS data for this year probably need to ask Micheal, I found somthinng is like FBLS so now I h
    
 ```{r}
     
@@ -423,6 +479,7 @@ There is no FBLS data for this year probably need to ask Micheal
 FBLN22 <- read.xlsx(paste0(wd$data,"2022 TheRecord-20220519.xlsx"))
 AR22 <- read.xlsx(paste0(wd$data,"2022 Tax Sale Results.xlsx"))
 ARPL22 <-read.csv(paste0(wd$data,"data pdf/2022-Tax-sale.csv"))
+Rdmp22<- subset (Data,TAX_SALE_YEAR==2022)
 
 ```
  
@@ -446,6 +503,24 @@ ARPL22 <-read.csv(paste0(wd$data,"data pdf/2022-Tax-sale.csv"))
   # remove un merged data set 
     rm(FBLN22,AR22, ARPL22)
 ```
+
+
+
+
+create a variable that shows if a house was redemed or not
+
+```{r}
+Rdmp22$REDEMPTION_NAME <- trimws(Rdmp22$REDEMPTION_NAME)
+
+
+Rdmp22$REDEEMED <- ifelse(Rdmp22$REDEMPTION_NAME == "" , 0, 1 )
+Rdmp22$REDEEMED <- ifelse(Rdmp22$REDEMPTION_DATE == "" , 0, 1 )
+
+Rdmp22$BID_TYPE <- ifelse(Rdmp22$BIDDING_NUMBER == "1" , "MCC", "PRIV" )
+
+
+```
+
 
 
 ## 2021  data into one file  ###
@@ -652,12 +727,13 @@ D21 <- D21 %>%
 
 
 
-## 2020 data  is the worst there is block and lot
+## 2020 data  is the worst there is no block and lot
 ```{r}
 
   AR20 <- read.csv(paste0(wd$data,"bidbaltimore_certificate_sale_results_2020.csv"))
   FB20 <- read.csv("bidbaltimore_assignment_sale_results_2020.csv")
   ARPL20 <-read.csv("data pdf/2020-Tax-sale.csv")
+Rdmp20<- subset (Data,TAX_SALE_YEAR==2020)
 
   rm(AR20, FB20, ARPL20)
 

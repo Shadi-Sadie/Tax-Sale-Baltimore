@@ -44,7 +44,6 @@ geocode_census <- function(address, block_lot = NULL) {
 
 
 
-result <- geocode_census("1600 Pennsylvania Ave NW, Washington, DC", key ="12321")
 
 
 
@@ -52,6 +51,7 @@ result <- geocode_census("1600 Pennsylvania Ave NW, Washington, DC", key ="12321
 
 ###############################################################################
 
+result <- geocode_census("1600 Pennsylvania Ave NW, Washington, DC", block_lot ="12321")
 
 address_df <- data.frame(address = c(
     "1600 Pennsylvania Ave NW, Washington, DC",
